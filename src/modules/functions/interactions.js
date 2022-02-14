@@ -1,6 +1,5 @@
 /* eslint-disable no-param-reassign */
-// eslint-disable-next-line func-names
-export default function (interaction) {
+export default (bot, interaction) => {
     /**
      * Send a interaction reply starting with a error emote
      * @param {string} option
@@ -42,4 +41,4 @@ export default function (interaction) {
             .then((int) => resolve(int))
             .catch((err) => reject(err));
     });
-}
+};
