@@ -21,15 +21,29 @@ const bot = new Client({
     intents: ['GUILDS', 'DIRECT_MESSAGES', 'GUILD_WEBHOOKS'],
 });
 
-// Define Winston options
-const options = {
-    transports: [
-        new winston.transports.Console(),
-    ],
+// Log format
+const logFormat = winston.format.printf(({ level, message, timestamp }) => `${timestamp} ${level.toUpperCase()}: ${message}`);
+
+// Logging levels
+const logLevels = {
+    levels: {
+        error: 0,
+        warn: 1,
+        debug: 2,
+        ready: 3,
+        cmd: 4,
+    },
 };
 
-// Create the logger
-bot.logger = winston.createLogger(options);
+bot.logger = winston.createLogger({
+    format: winston.format.combine(
+        winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+        logFormat,
+    ),
+    transports: [new winston.transports.Console({ colorize: true })],
+    levels: logLevels.levels,
+    level: 'cmd',
+});
 
 // Define the init function
 const init = async () => {
@@ -47,7 +61,7 @@ const init = async () => {
                                                                                               `);
 
     // Import prototypes
-    // (await import('./modules/functions/prototypes.js')).default();
+    (await import('./modules/functions/prototypes.js')).default();
 
     // Setup & Instantiate the Sentry client
     Sentry.init({
