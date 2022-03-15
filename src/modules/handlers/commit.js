@@ -48,7 +48,7 @@ export default async function CommitHandler(bot) {
 
         // If the commit is not in the database, add it
         if (!commitFromDB) {
-            bot.logger.info(`Adding ${firstComment.buildNumber} to the database`);
+            bot.logger.debug(`Adding ${firstComment.buildNumber} to the database`);
 
             const doc = await commits.create({
                 ...firstComment,
@@ -56,7 +56,7 @@ export default async function CommitHandler(bot) {
             });
 
             // eslint-disable-next-line no-underscore-dangle
-            bot.logger.info(`Added Commit ${doc._id} for Build ${doc.buildNumber}`);
+            bot.logger.debug(`Added Commit ${doc._id} for Build ${doc.buildNumber}`);
         }
     }
 }
