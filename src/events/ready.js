@@ -24,7 +24,7 @@ export default async (bot) => {
     // Stop and update the ready message
     rdyMsg.stopAndPersist({
         symbol: '✔️',
-        text: ` ${bot.user.username} is online on ${bot.guilds.cache.size} servers and serving ${bot.users.cache.size} users!`,
+        text: ` ${bot.user.username} is online on ${bot.guilds.cache.size} guilds!`,
     });
 
     // Send a spacer
