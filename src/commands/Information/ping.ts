@@ -1,20 +1,23 @@
-export default {
+import { ICommand } from "../../Interfaces/ICommand";
+
+const command: ICommand = {
     info: {
         name: 'ping',
         description: 'Check the latency between the bot and Discord',
         category: 'Information',
-    },
-    perms: {
-        permission: ['@everyone'],
-        type: 'role',
-        self: [],
+        selfPerms: []
     },
     opts: {
-        guildOnly: false,
+        devOnly: false,
         disabled: false,
     },
     slash: {
+        types: {
+            chat: true
+        },
         opts: [],
+        dmPermission: false,
+        defaultPermission: true
     },
 
     run: async (bot, interaction) => {
@@ -22,3 +25,5 @@ export default {
         interaction.reply(`:hearts: Current Ping: \`${Math.round(bot.ws.ping)}ms\``);
     },
 };
+
+export default command;

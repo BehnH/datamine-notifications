@@ -1,41 +1,40 @@
 import { stripIndents } from 'common-tags';
 import { formatDistance } from 'date-fns';
-import { MessageEmbed, version } from 'discord.js';
+import { EmbedBuilder, GuildMember, PermissionFlagsBits, version } from 'discord.js';
 import mongoose from 'mongoose';
 import os from 'os';
+import { ICommand } from '../../Interfaces/ICommand';
+import { commands } from '../../modules/handlers/command';
 
-export default {
+const command: ICommand = {
     info: {
         name: 'botstats',
         description: 'View stats for the Bot',
         category: 'Information',
-    },
-    perms: {
-        permission: ['@everyone'],
-        type: 'role',
-        self: ['EMBED_LINKS'],
+        selfPerms: [ PermissionFlagsBits.EmbedLinks ]
     },
     opts: {
-        guildOnly: false,
+        devOnly: false,
         disabled: false,
     },
     slash: {
+        types: {
+            chat: true
+        },
         opts: [],
+        dmPermission: true,
+        defaultPermission: true
     },
 
     run: async (bot, interaction) => {
-        // Get and format the bot uptime
-        const uptime = formatDistance(0, bot.uptime);
+        const embed = new EmbedBuilder()
+            .setAuthor({ name: `${bot.user?.username}`, iconURL: bot.user?.displayAvatarURL() })
+            .setColor((interaction.member as GuildMember)?.displayColor || '#6FD6FF')
+            .setDescription(stripIndents`Developed By: [\`Behn#0001\`](https://discord.com/users/648882989471891499)
 
-        // Build the embed
-        const embed = new MessageEmbed()
-            .setAuthor({ name: `${bot.user.username} v`, iconURL: bot.user.displayAvatarURL({ format: 'png', dynamic: true }) })
-            .setColor(interaction.member?.displayColor || '#6FD6FF')
-            .setDescription(stripIndents`Developed By: [\`Waitrose#0001\`](https://discord.com/users/648882989471891499)
-
-            Uptime: **${uptime}**
+            Uptime: **<t:${bot.uptime}:R>**
             Database State: ${mongoose.connection.readyState === 1 ? 'Healthy' : 'Unhealthy'}
-            Commands: **${bot.commands.size}**
+            Commands: **${commands.size}**
             Memory Usage: **${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB / ${(os.totalmem() / 1024 / 1024) > 1024 ? `${(os.totalmem() / 1024 / 1024 / 1024).toFixed(2)} GB` : `${(os.totalmem() / 1024 / 1024).toFixed(2)}`}** | Ping: **${bot.ws.ping}ms**
             **${bot.guilds.cache.size.toLocaleString()}** servers | **${bot.channels.cache.size.toLocaleString()}** channels | **${bot.users.cache.size.toLocaleString()}** users
 
@@ -46,3 +45,5 @@ export default {
         interaction.reply({ embeds: [embed] });
     },
 };
+
+export default command;
