@@ -5,8 +5,12 @@
   "main": "src/app.js",
   "type": "module",
   "scripts": {
-    "dev": "NODE_ENV=development node dist/app.js",
-    "prod": "NODE_ENV=production node dist/app.js"
+    "start": "node dist/bot.js",
+    "build": "tsc --project tsconfig.json",
+    "watch-node": "nodemon dist/index.js",
+    "watch-ts": "tsc -w",
+    "dev": "nodemon -r ./src/bot.ts",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
