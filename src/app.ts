@@ -1,15 +1,14 @@
-import { Client, GatewayIntentBits, Partials } from 'discord.js';
-import winston from 'winston';
+import { Client } from 'discord.js';
 import dotenv from 'dotenv';
-import ora from 'ora';
 import Sentry from '@sentry/node';
 import Tracing from '@sentry/tracing';
-import mongoose from 'mongoose';
 
 import { commands, init as commandInit } from './modules/handlers/command';
 import { init as eventsInit } from './modules/handlers/event';
 import logger from './logger';
-import { getMongooseURL, init as dbInit } from './database/mongo';
+import { INTENTS, PARTIALS } from './config/constants';
+import { redis } from './database/redis';
+import { createClient } from 'redis';
 
 // Load env variables
 dotenv.config();
@@ -19,15 +18,11 @@ const bot = new Client({
     allowedMentions: {
         parse: ['users', 'roles'],
     },
-    partials: [Partials.User],
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.DirectMessages, GatewayIntentBits.GuildWebhooks],
+    intents: INTENTS,
+    partials: PARTIALS
 });
 
-// Initialize Mongo connection
-const mongooseUrl = getMongooseURL(process.env.MONGODB_USERNAME, process.env.MONGODB_PASSWORD, process.env.MONGODB_HOST, process.env.MONGODB_PORT, process.env.MONGODB_DATABASE);
-export const db = dbInit(mongooseUrl)
-    .then(() => logger.debug('Successfully started DB'))
-    .catch((err) => logger.error('Failed to connect to Mongo:', err));
+export const redisClient = createClient({ url: process.env.REDIS_URI });
 
 // Define the init function
 const init = async () => {
@@ -36,7 +31,6 @@ const init = async () => {
     // Setup & Instantiate the Sentry client
     Sentry.init({
         dsn: process.env.SENTRY_DSN,
-        integrations: [new Tracing.Integrations.Mongo()],
         tracesSampleRate: 1.0,
     });
 
@@ -58,6 +52,12 @@ const init = async () => {
 
     // Send the login message
     logger.info('Logging into the Discord API...');
+
+
+    redisClient.on('error', (err) => console.log('Redis Client Error', err));
+    await redisClient.connect();
+
+    console.log(redisClient.MEMORY_STATS);
 
     // Login to the Discord API and update the login message
     bot.login(process.env.BOT_TOKEN)

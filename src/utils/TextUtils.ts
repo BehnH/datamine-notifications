@@ -1,12 +1,10 @@
-/* eslint-disable func-names */
-/* eslint-disable no-extend-native */
-export default function () {
-    String.prototype.toTitleCase = function () {
-        let i;
-        let j;
-        let str;
+export class TextUtils {
+    static toTitleCase(text: string) {
+        let i: number;
+        let j: number;
+        let str: string;
         // eslint-disable-next-line prefer-arrow-callback
-        str = this.replace(/([^\W_]+[^\s-]*) */g, function (txt) {
+        str = text.replace(/([^\W_]+[^\s-]*) */g, function (txt) {
             return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
         });
 
@@ -33,5 +31,14 @@ export default function () {
             );
         }
         return str;
-    };
+    }
+
+    static removeHtml(text: string) {
+        return text.replace(/<[^>]+>/g, '');
+    }
+
+    static convertMarkdown(text: string) {
+        return text.replace(/\[/g, '')
+            .replace(/]/g, '');
+    }
 }
